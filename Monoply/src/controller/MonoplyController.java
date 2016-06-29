@@ -224,7 +224,24 @@ public class MonoplyController implements MouseListener, ActionListener{
 	
 	//Calculates the rent paid on the current property tile
 	//PRECONDITION: position of players[turn] must be on a property tile
-	public void payRent(){
+	public void payPropertyRent(){
+		Player player = players[turn];
+		Property currentProperty = (Property)board.boardTiles[player.position];
+		
+		int rentPaid = currentProperty.rent;
+		
+		if(allColorsBought(player, currentProperty.color)){
+			rentPaid*=2;
+		}
+		
+		if(player.money>=rentPaid){
+			player.money-=rentPaid;
+			currentProperty.owner.money+=rentPaid;
+			view.displayRentMessage(player, rentPaid);
+		}else{
+			view.displayNoMoneyMessage(player);
+		}
+		
 		
 	}
 	
@@ -238,7 +255,7 @@ public class MonoplyController implements MouseListener, ActionListener{
 		if(currentPosition.name.equals("Property")){
 			Property currentProperty = (Property)currentPosition;
 			if(currentProperty.owner!=null){
-				payRent();
+				payPropertyRent();
 			}else{
 				view.displayBuyAndAuctionProperty();
 				//view.addBuyAuctionActionListener(this);
@@ -262,6 +279,18 @@ public class MonoplyController implements MouseListener, ActionListener{
 		view.displayRollDice();
 		view.updateCurrentTurnLabel();
 		//view.addDiceActionListener(this);
+	}
+	
+	public boolean allColorsBought(Player player, int color){
+		for(int i=0;i<board.boardTiles.length;i++){
+			if(board.boardTiles[i].name.equals("Property")){
+				Property currentProperty = (Property)board.boardTiles[i];
+				if(currentProperty.color==color && currentProperty.owner!=player){
+					return false;
+				}
+			}
+		}
+		return true;
 	}
 	
 }

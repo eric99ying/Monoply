@@ -210,7 +210,7 @@ public class MonoplyView {
     	
     	//Adds action listeners
     	rollDice.addActionListener(controller);
-    	window.setVisible(true);
+    	rollDice.setVisible(true);
     }
     
     //Displays end turn buttons, allowing players to end their turn
@@ -220,7 +220,8 @@ public class MonoplyView {
     	window.add(endTurn);
     	
     	endTurn.addActionListener(controller);
-    	window.setVisible(true);
+    	endTurn.setVisible(true);
+    	
     }
     
     //Adds the buy property button
@@ -238,34 +239,38 @@ public class MonoplyView {
     	//Adds action Listeners
     	buyProperty.addActionListener(controller);
     	auctionProperty.addActionListener(controller);
-    	window.setVisible(true);
+    	buyProperty.setVisible(true);
+    	auctionProperty.setVisible(true);
     }
     
     //Gets rid of roll dice
     public void removeRollDice(){
     	if(rollDice!=null){
     		window.remove(rollDice);
+    		rollDice.setVisible(false);
     	}
-    	window.setVisible(true);
     }
     
     //Gets rid of roll dice
     public void removeBuyAuctionProperty(){
     	if(buyProperty!=null){
     		window.remove(buyProperty);
+    		buyProperty.setVisible(false);
     	}
     	if(auctionProperty!=null){
     		window.remove(auctionProperty);
+    		auctionProperty.setVisible(false);
     	}
-    	window.setVisible(true);
+    	
     }
     
     //Gets rid of end Turn button
     public void removeEndTurn(){
     	if(endTurn!=null){
     		window.remove(endTurn);
+    		endTurn.setVisible(false);
+    		
     	}
-    	window.setVisible(true);
     }
     
     /*
@@ -370,6 +375,12 @@ public class MonoplyView {
 		for(int i=0;i<player.ownedProperties.size();i++){
 			text+=player.ownedProperties.get(i).propertyName + "<br>";
 		}
+		text+="</html>";
+		pane.showMessageDialog(window, text);
+	}
+	
+	public void displayRentMessage(Player player, int moneyPaid){
+		String text = "<html>"+player.name+" paid $"+moneyPaid+" as rent.";
 		text+="</html>";
 		pane.showMessageDialog(window, text);
 	}
