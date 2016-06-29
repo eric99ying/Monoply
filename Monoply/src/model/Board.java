@@ -2,14 +2,14 @@ package model;
 
 public class Board {
 	//Color CONSTANTS
-	public final int PURPLE = 1;
-	public final int LIGHTBLUE = 2;
-	public final int MAGENTA = 3;
-	public final int ORANGE = 4;
-	public final int RED = 5;
-	public final int YELLOW = 6;
-	public final int GREEN = 7;
-	public final int BLUE = 8;
+	public static final int PURPLE = 1;
+	public static final int LIGHTBLUE = 2;
+	public static final int MAGENTA = 3;
+	public static final int ORANGE = 4;
+	public static final int RED = 5;
+	public static final int YELLOW = 6;
+	public static final int GREEN = 7;
+	public static final int BLUE = 8;
 
 	//Board consists of an array of Tiles, with GO being the very first tile
 	public Tile[] boardTiles = {new Go(),

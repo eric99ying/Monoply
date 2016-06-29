@@ -281,6 +281,8 @@ public class MonoplyController implements MouseListener, ActionListener{
 		//view.addDiceActionListener(this);
 	}
 	
+	//Returns a boolean indicating if a player has all properties on a given color so he or she can
+	//buy a house or double the rent
 	public boolean allColorsBought(Player player, int color){
 		for(int i=0;i<board.boardTiles.length;i++){
 			if(board.boardTiles[i].name.equals("Property")){
@@ -291,6 +293,27 @@ public class MonoplyController implements MouseListener, ActionListener{
 			}
 		}
 		return true;
+	}
+	
+	//Returns all properties with the specified color in an array
+	public Property[] sameColorProperties(int color){
+		Property[] output;
+		if(color == Board.PURPLE || color == Board.BLUE){
+			output = new Property[2];
+		}else{
+			output = new Property[3];
+		}
+		int counter = 0;
+		for(int i=0;i<board.boardTiles.length;i++){
+			if(board.boardTiles[i].name.equals("Property")){
+				Property currentProperty = (Property)board.boardTiles[i];
+				if(currentProperty.color==color){
+					output[counter] = currentProperty;
+					counter++;
+				}
+			}
+		}
+		return output;
 	}
 	
 }
