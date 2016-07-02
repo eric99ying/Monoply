@@ -5,7 +5,8 @@ public class Player {
 	
 	//The Player class has an arraylist of owned properties
 	public ArrayList<Property> ownedProperties = new ArrayList<Property>();
-
+	public ArrayList<Railroad> ownedRailroads = new ArrayList<Railroad>();
+	
 	//Number of railroads, utilities, and get out of jail cards
 	public int numRailroads;
 	public int numUtilities;

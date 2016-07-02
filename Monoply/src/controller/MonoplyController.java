@@ -62,6 +62,8 @@ public class MonoplyController implements MouseListener, ActionListener{
 		//view.addDiceActionListener(this);
 		view.addMouseListenerPlayerInfo(this);
 		
+		view.displayBuyAndSellHouse();
+		
 	}
 
 	//Mouse Events
@@ -113,9 +115,15 @@ public class MonoplyController implements MouseListener, ActionListener{
 		if(e.getSource()==view.rollDice){
 			rollDiceAndMove();
 		}else if(e.getSource()==view.buyProperty){
-			buyProperty();
+			if(board.boardTiles[players[turn].position].name.equals("Property"))
+				buyProperty();
+			else if(board.boardTiles[players[turn].position].name.equals("Railroad"))
+				buyRailroad();
 		}else if(e.getSource()==view.auctionProperty){
-			auctionProperty();
+			if(board.boardTiles[players[turn].position].name.equals("Property"))
+				auctionProperty();
+			else if(board.boardTiles[players[turn].position].name.equals("Railroad"))
+				auctionRailroad();
 		}else if(e.getSource()==view.endTurn){
 			nextTurn();
 		}
@@ -180,6 +188,27 @@ public class MonoplyController implements MouseListener, ActionListener{
 		view.displayEndTurn();
 	}
 	
+	public void buyRailroad(){
+		Player player = players[turn];
+		Railroad railroad = (Railroad)board.boardTiles[player.position];
+		
+		//Makes sure the player has enough money
+		if(player.money>=100){
+			player.money-=100;
+			railroad.owner = player;
+			player.ownedRailroads.add(railroad);
+		}else{
+			view.displayNoMoneyMessage(player);
+		}
+		
+		view.updatePositionInfo();
+		view.updatePlayerInfo();
+		
+		//Removes buy auction buttons and adds end turn button
+		view.removeBuyAuctionProperty();
+		view.displayEndTurn();
+	}
+	
 	//Auctions off the current property
 	//PRECONDITION: position of players[turn] must be on a property tile
 	public void auctionProperty(){
@@ -222,6 +251,46 @@ public class MonoplyController implements MouseListener, ActionListener{
 		view.displayEndTurn();
 	}
 	
+	public void auctionRailroad(){
+		//Declare the highest bid and the bidder variables
+		int highestBid = 0;
+		Player currentLeader = players[turn];
+		
+		String[] playerNames = new String[5];
+		for(int i=0;i<4;i++){
+			playerNames[i] = players[i].name;
+		}
+		playerNames[4] = "End Auction";
+		
+		int choice = 0;
+		
+		//Keeps asking for bid until the players agree to end the auction 
+		do{
+			choice = view.displayPlayerOptions(playerNames,highestBid,currentLeader);
+			if(choice!=4){
+				int money = view.displayMoneyAmount();
+				if(money>highestBid){
+					highestBid = money;
+					currentLeader = players[choice];
+				}else{
+					view.displayNotEnoughMoneyMessage(players[choice]);
+				}
+			}
+		}while(choice!=4);
+			
+		//Gives the property to highest bidder
+		currentLeader.money-=highestBid;
+		Railroad railroad = (Railroad)board.boardTiles[players[turn].position];
+		railroad.owner = currentLeader;
+		currentLeader.ownedRailroads.add(railroad);
+		view.updatePositionInfo();
+		view.updatePlayerInfo();
+		
+		//Removes buy and auction buttons and adds end turn button
+		view.removeBuyAuctionProperty();
+		view.displayEndTurn();
+	}
+	
 	//Calculates the rent paid on the current property tile
 	//PRECONDITION: position of players[turn] must be on a property tile
 	public void payPropertyRent(){
@@ -245,6 +314,24 @@ public class MonoplyController implements MouseListener, ActionListener{
 		
 	}
 	
+	//Calculates the rent paid on the current railroad tile
+	//PRECONDITION: position of players[turn] must be on a railroad tile
+	public void payRailroadRent(){
+		Player player = players[turn];
+		Railroad currentRailroad = (Railroad)board.boardTiles[player.position];
+		
+		int rentPaid = (int)(25 * Math.pow(2,currentRailroad.owner.ownedRailroads.size()-1));
+		
+		if(player.money>=rentPaid){
+			player.money-=rentPaid;
+			currentRailroad.owner.money+=rentPaid;
+			view.displayRentMessage(player, rentPaid);
+		}else{
+			view.displayNoMoneyMessage(player);
+		}
+		
+	}
+	
 	//Intermediate methods that happens right after the player moves such as paying rent, displaying buttons for buying,
 	//auctioning, mortgaging, buying houses, etc...
 	public void afterMovePhase(){
@@ -256,6 +343,14 @@ public class MonoplyController implements MouseListener, ActionListener{
 			Property currentProperty = (Property)currentPosition;
 			if(currentProperty.owner!=null){
 				payPropertyRent();
+			}else{
+				view.displayBuyAndAuctionProperty();
+				//view.addBuyAuctionActionListener(this);
+			}
+		}else if(currentPosition.name.equals("Railroad")){
+			Railroad currentRailroad = (Railroad)currentPosition;
+			if(currentRailroad.owner!=null){
+				payRailroadRent();
 			}else{
 				view.displayBuyAndAuctionProperty();
 				//view.addBuyAuctionActionListener(this);
